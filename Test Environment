@@ -1,0 +1,30 @@
+pipeline{
+agent any
+options{
+	buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '15')
+}
+stages{
+	stage('checkout_repo'){
+		steps{
+			checkout scm       //checking out the git repository
+		}
+	}
+	stage('build'){
+		steps{
+			dir('build_folder'){ //the folder where 
+				docker build . -f build.dockerfile -t first_build   //step to build image
+			}
+		}
+	}
+	stage('initial_tests'){
+		steps{
+			 sh label: 'testmachine', script: 'python -m pytest -v /tests/initial'   //step to run the initial tests. I took python tests as example
+		}
+	}
+	stage('secondary_tests'){
+		steps{
+			sh label: 'secondary_testmachine', script: 'python -m pytest -v /tests/secondary'  //step to run the extended tests on a different machine
+		}
+	}
+}
+}
