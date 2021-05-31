@@ -2,7 +2,7 @@ pipeline {
   environment {
     imagename = "caitanyakotla/udacitykrishnaprod"
     registryCredential = 'dockerhub-id'
-    dockerImage = ''
+    dockerImage = docker.build registry + ":$BUILD_NUMBER"
   }
   agent any
   stages {
@@ -18,35 +18,25 @@ pipeline {
         }
       }
     }
-    stage('Clean Up Image'){
-            steps { 
-                sh "docker rmi caitanyakotla/udacitykrishnaprod:latest" 
-            }
+    stage('Building image') {
+      steps{
+        script {
+          dockerImage = docker.build registry + ":$BUILD_NUMBER"
         }
-    stage('Push image') {
-       docker.withRegistry('https://registry.hub.docker.com', 'git') {            
-       app.push("${env.BUILD_NUMBER}")            
-       app.push("latest")        
-              }    
-           }
-    
-      
+      }
+    }
     stage('Deploy Image') {
       steps{
         script {
           docker.withRegistry( '', registryCredential ) {
-            dockerImage.push("$BUILD_NUMBER")
-             dockerImage.push('latest')
-
+            dockerImage.push()
           }
         }
       }
     }
     stage('Remove Unused docker image') {
       steps{
-        sh "docker rmi $imagename:$BUILD_NUMBER"
-         sh "docker rmi $imagename:latest"
-
+        sh "docker rmi $registry:$BUILD_NUMBER"
       }
     }
   }
