@@ -20,11 +20,11 @@ pipeline {
     }
     
     stage('Deploy Master Image') {
-   when {
-      anyOf {
-            branch 'master'
-      }
-     }
+       when {
+          anyOf {
+                branch 'master'
+               }
+            }
     }
     
     stage('Deploy Image') {
