@@ -18,7 +18,7 @@ pipeline {
         }
       }
     }
-    stage('Clean Up Green Image'){
+    stage('Clean Up Image'){
             steps { 
                 sh "docker rmi caitanyakotla/udacitykrishnaprod:latest" 
             }
